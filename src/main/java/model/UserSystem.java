@@ -17,6 +17,10 @@ public class UserSystem {
         private List<User> users;
         private String fileName;
 
+        public UserSystem(){
+            this("LoginDB");
+        }
+
         public UserSystem(String fileName) {
             this.users = new ArrayList<>();
             this.fileName = fileName;
@@ -44,7 +48,7 @@ public class UserSystem {
 
         //Er wordt een wrongpass-exception opgegooid als user al geregistreerd is met een ander passwoord
         //daar kan je de message van gewoon op een van beide fout-locaties printen die voorzien zijn in de loginController.
-        public void validateUser(String name, String password) throws WrongPassException{
+        public User validateUser(String name, String password) throws WrongPassException{
             User user = findUserByName(name);
             if(user != null) {
                 if(!BCrypt.checkpw(password, user.getPassword())) {
@@ -53,6 +57,7 @@ public class UserSystem {
             } else {
                 registerUser(name, password);
             }
+            return user;
         }
 
         public User findUserByName(String name) {
