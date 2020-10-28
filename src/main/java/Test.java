@@ -44,11 +44,17 @@ public class Test {
         }
 
         server.addMessage("Message5", user1);
-        server.addMessage("Message6", user1);
-        server.addMessage("Message7", user1);
 
         msgIt = server.getMessageIterator();
-        System.out.println("printing last 5 messages: ");
+        System.out.println("printing first 5 messages: ");
+        while(msgIt.hasNext()){
+            System.out.println("\t" + msgIt.next());
+        }
+
+        server.addMessage("Message6", user1);
+
+        msgIt = server.getMessageIterator();
+        System.out.println("should now that startSize is exceeded be printing last 5 messages: ");
         while(msgIt.hasNext()){
             System.out.println("\t" + msgIt.next());
         }

@@ -53,7 +53,7 @@ public class Server {
 
     //return an iterator that returns the last "defaultChatSize" messages
     public Iterator<Message> getMessageIterator(){
-        if(messages.size() > 6) {
+        if(messages.size() > defaultChatSize) {
             return messages.listIterator(messages.size() - defaultChatSize);
         } else {
             return messages.listIterator(0);
