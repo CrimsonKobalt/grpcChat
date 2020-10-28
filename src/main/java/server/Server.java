@@ -10,17 +10,29 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Server {
-    private UserSystem userSystem;
-    private List<Message> messages;
+    private final UserSystem userSystem;
+    private final List<Message> messages;
 
-    public Server(String userSystemName){
+    private int defaultChatSize;
+
+    public Server(String userSystemName, int size){
         this.userSystem = new UserSystem(userSystemName);
         this.messages = new ArrayList<>();
+        this.defaultChatSize = size;
+    }
+
+    public Server(String userSystemName){
+        this(userSystemName, 5);
+    }
+
+    public Server(int size){
+        this.userSystem = new UserSystem();
+        this.messages = new ArrayList<>();
+        this.defaultChatSize = size;
     }
 
     public Server(){
-        this.userSystem = new UserSystem();
-        this.messages = new ArrayList<>();
+        this(5);
     }
 
     public void addMessage(String content, User sender){
@@ -35,20 +47,20 @@ public class Server {
 
     public User validateUser(String usn, String psw) throws WrongPassException {
         synchronized (this){
-            try {
-                return userSystem.validateUser(usn, psw);
-            } catch(Exception e){
-                System.out.println("thread-error encountered. UserSystem might be corrupted.");
-            }
+            return userSystem.validateUser(usn, psw);
         }
-        return null;
     }
 
+    //return an iterator that returns the last "defaultChatSize" messages
     public Iterator<Message> getMessageIterator(){
         if(messages.size() > 6) {
-            return messages.listIterator(messages.size() - 5);
+            return messages.listIterator(messages.size() - defaultChatSize);
         } else {
             return messages.listIterator(0);
         }
+    }
+
+    public synchronized void closeServer(){
+        userSystem.exitUserSystem();
     }
 }

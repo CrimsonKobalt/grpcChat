@@ -7,11 +7,11 @@ import java.util.Iterator;
 
 public class Test {
     //testfile aanpassing
-    public static void Main(String[] args) throws WrongPassException {
+    public static void main(String[] args) throws WrongPassException {
         System.out.println("Commencing test...");
         Server server = new Server("testServer");
 
-        User user1 = server.validateUser("new user1", "password");
+        User user1 = server.validateUser("new user3", "password");
 
         try {
             server.validateUser("new user1", "p4ssw0rd");
@@ -29,6 +29,7 @@ public class Test {
         }
 
         //commencing testing of messaging system...
+        System.out.println("---------------");
         System.out.println("commencing testing of messaging system...");
         server.addMessage("Message1", user1);
         server.addMessage("Message2", user1);
@@ -36,8 +37,10 @@ public class Test {
         server.addMessage("Message4", user1);
 
         Iterator<Message> msgIt = server.getMessageIterator();
+        System.out.println("printing first 4 messages: ");
+
         while(msgIt.hasNext()){
-            System.out.println(msgIt.next());
+            System.out.println("\t" + msgIt.next());
         }
 
         server.addMessage("Message5", user1);
@@ -45,8 +48,11 @@ public class Test {
         server.addMessage("Message7", user1);
 
         msgIt = server.getMessageIterator();
+        System.out.println("printing last 5 messages: ");
         while(msgIt.hasNext()){
-            System.out.println(msgIt.next());
+            System.out.println("\t" + msgIt.next());
         }
+
+        server.closeServer();
     }
 }

@@ -1,5 +1,5 @@
 plugins {
-    id 'java'
+    id "application"
 }
 
 group 'org.example'
@@ -14,9 +14,12 @@ dependencies {
     implementation files('libs/jbcrypt-0.4.jar')
 }
 
-task runWithJavaExec(type: JavaExec) {
-    group = "Execution"
-    description = "Run the main class with JavaExecTask"
-    classpath = sourceSets.main.runtimeClasspath
-    main = "Test"
+apply plugin : "java"
+
+ext {
+    javaMainClass = "Test"
+}
+
+application {
+    mainClassName = javaMainClass
 }

@@ -14,16 +14,16 @@ import exceptions.WrongPassException;
 
 //deze klasse houdt een lijst bij van alle users, en kan gebruikt worden om te identificeren.
 public class UserSystem {
-        private List<User> users;
-        private String fileName;
+        private final List<User> users;
+        private final String fileName;
 
         public UserSystem(){
-            this("LoginDB");
+            this("LoginDB.txt");
         }
 
         public UserSystem(String fileName) {
             this.users = new ArrayList<>();
-            this.fileName = fileName;
+            this.fileName = fileName+".txt";
             this.readFromFile();
         }
 
@@ -32,18 +32,25 @@ public class UserSystem {
             exitUserSystem();
         }
 
+        public void closeUserSystem(){
+            exitUserSystem();
+        }
+
         public void exitUserSystem() {
             System.out.println("saving database...");
             if(this.logToFile()) {
                 System.out.println("logged succesfully.");
                 return;
-            };
+            }
             System.out.println("Critical error with logging detected.");
         }
 
-        private void registerUser(String name, String password) {
+        private User registerUser(String name, String password) {
+            System.out.println("Registering user: "+name);
             String hash = BCrypt.hashpw(password, BCrypt.gensalt(10));
-            users.add(new User(name, hash));
+            User result = new User(name, hash);
+            users.add(result);
+            return result;
         }
 
         //Er wordt een wrongpass-exception opgegooid als user al geregistreerd is met een ander passwoord
@@ -55,7 +62,7 @@ public class UserSystem {
                     throw new WrongPassException();
                 }
             } else {
-                registerUser(name, password);
+                user = registerUser(name, password);
             }
             return user;
         }
@@ -72,7 +79,7 @@ public class UserSystem {
         private boolean logToFile() {
             try {
                 BufferedWriter writer = new BufferedWriter(new FileWriter(this.fileName));
-                writer.write(users.size());
+                writer.write(Integer.toString(users.size()));
                 writer.newLine();
                 for(User user: users) {
                     writer.write(user.toString());
