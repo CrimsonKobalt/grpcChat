@@ -1,9 +1,56 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.13'
+        classpath 'org.openjfx:javafx-plugin:0.0.9'
+    }
+}
+
 plugins {
+    id "com.google.protobuf" version "0.8.13"
+    id "java"
     id "application"
+    id "idea"
+    id 'com.github.ben-manes.versions' version '0.19.0'
+    id 'org.openjfx.javafxplugin' version '0.0.9'
 }
 
 group 'org.example'
 version '1.0-SNAPSHOT'
+
+protobuf {
+    protoc {
+        // The version of protoc must match protobuf-java. If you don't depend on
+        // protobuf-java directly, you will be transitively depending on the
+        // protobuf-java version that grpc depends on.
+        artifact = "com.google.protobuf:protoc:3.6.0"
+    }
+    plugins {
+        grpc {
+            artifact = 'io.grpc:protoc-gen-grpc-java:1.12.0'
+        }
+    }
+    generateProtoTasks {
+        all()*.plugins {
+            grpc {}
+        }
+    }
+    generatedFilesBaseDir = "$projectDir/src/generated"
+}
+
+javafx {
+    version = '12'
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
+    configuration = 'compileOnly'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -11,10 +58,17 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile 'io.grpc:grpc-all:1.12.0'
+    compile 'javax.annotation:javax.annotation-api:1.2'
     implementation files('libs/jbcrypt-0.4.jar')
 }
 
-apply plugin : "java"
+idea {
+    module {
+        sourceDirs += file("${projectDir}/src/generated/main/java");
+        sourceDirs += file("${projectDir}/src/generated/main/grpc");
+    }
+}
 
 ext {
     javaMainClass = "Test"

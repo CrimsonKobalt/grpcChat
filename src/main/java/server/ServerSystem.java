@@ -9,29 +9,29 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class Server {
+public class ServerSystem {
     private final UserSystem userSystem;
     private final List<Message> messages;
 
     private final int defaultChatSize;
 
-    public Server(String userSystemName, int size){
+    public ServerSystem(String userSystemName, int size){
         this.userSystem = new UserSystem(userSystemName);
         this.messages = new ArrayList<>();
         this.defaultChatSize = size;
     }
 
-    public Server(String userSystemName){
+    public ServerSystem(String userSystemName){
         this(userSystemName, 5);
     }
 
-    public Server(int size){
+    public ServerSystem(int size){
         this.userSystem = new UserSystem();
         this.messages = new ArrayList<>();
         this.defaultChatSize = size;
     }
 
-    public Server(){
+    public ServerSystem(){
         this(5);
     }
 
