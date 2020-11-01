@@ -21,4 +21,12 @@ public class Message {
     public String toString(){
         return content+","+sender.getName()+","+postTime.toString();
     }
+
+    public String getContent(){
+        return this.content;
+    }
+
+    public String getSenderName(){
+        return this.sender.getName();
+    }
 }

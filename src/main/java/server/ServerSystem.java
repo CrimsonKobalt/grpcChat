@@ -35,6 +35,10 @@ public class ServerSystem {
         this(5);
     }
 
+    public UserSystem getUserSystem(){
+        return this.userSystem;
+    }
+
     public void addMessage(String content, User sender){
         synchronized (this){
             try {
