@@ -46,7 +46,6 @@ protobuf {
 javafx {
     version = '12'
     modules = [ 'javafx.controls', 'javafx.fxml' ]
-    configuration = 'compileOnly'
 }
 
 sourceCompatibility = 1.8
@@ -65,15 +64,25 @@ dependencies {
 
 idea {
     module {
-        sourceDirs += file("${projectDir}/src/generated/main/java");
-        sourceDirs += file("${projectDir}/src/generated/main/grpc");
+        sourceDirs += file("${projectDir}/src/generated/main/java")
+        sourceDirs += file("${projectDir}/src/generated/main/grpc")
     }
 }
 
 ext {
-    javaMainClass = "Test"
+    javaMainClass = "client.ClientServer"
 }
 
 application {
     mainClassName = javaMainClass
+}
+
+task runServer(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'server.ChatServer'
+}
+
+task runClient(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'client.ClientServer'
 }

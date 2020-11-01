@@ -70,7 +70,7 @@ public class ChatServer{
     private static class ChatService extends GroupChatGrpc.GroupChatImplBase {
 
         @Override
-        public void getGroupHistory(Empty request, StreamObserver<grpcchat.MessageLine> responseObserver) {
+        public synchronized void getGroupHistory(Empty request, StreamObserver<grpcchat.MessageLine> responseObserver) {
             Iterator<Message> groupChatIterator = serverSystem.getMessageIterator();
             while(groupChatIterator.hasNext()){
                 Message msg = groupChatIterator.next();
@@ -82,7 +82,7 @@ public class ChatServer{
         }
 
         @Override
-        public synchronized void syncGroupChat(Empty request, StreamObserver<MessageLine> responseObserver) {
+        public void syncGroupChat(Empty request, StreamObserver<MessageLine> responseObserver) {
             while(true){
                 try {
                     newMessageMutex.wait();
@@ -110,8 +110,9 @@ public class ChatServer{
         }
 
         @Override
-        public synchronized void authenticateUser(UserDetails request, StreamObserver<Agreement> responseObserver) {
+        public void authenticateUser(UserDetails request, StreamObserver<Agreement> responseObserver) {
             try {
+                System.out.println("auth request: "+ request.getName() +", "+request.getPassword());
                 User user = serverSystem.validateUser(request.getName(), request.getPassword(), newUserMutex);
                 responseObserver.onNext(Agreement.newBuilder().setLoginSuccess(true)
                                                               .setName(request.getName())

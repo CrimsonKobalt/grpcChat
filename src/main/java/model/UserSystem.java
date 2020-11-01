@@ -51,11 +51,13 @@ public class UserSystem {
 
         private User registerUser(String name, String password, Object newUserMutex) {
             System.out.println("Registering user: "+name);
-            String hash = BCrypt.hashpw(password, BCrypt.gensalt(10));
-            User result = new User(name, hash);
-            users.add(result);
-            newUserMutex.notify();
-            return result;
+            synchronized (newUserMutex){
+                String hash = BCrypt.hashpw(password, BCrypt.gensalt(10));
+                User result = new User(name, hash);
+                users.add(result);
+                newUserMutex.notifyAll();
+                return result;
+            }
         }
 
         //Er wordt een wrongpass-exception opgegooid als user al geregistreerd is met een ander passwoord

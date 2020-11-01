@@ -2,6 +2,8 @@ package gui;
 
 import java.io.IOException;
 
+import client.ClientServer;
+import exceptions.WrongPassException;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -9,8 +11,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import model.User;
 
 public class LoginController {
+	ClientServer server;
 
 	@FXML
 	private Button EnterChatButton;
@@ -26,12 +30,21 @@ public class LoginController {
 
 	@FXML
 	public void enterChatButtonClicked(ActionEvent event) throws IOException {
+		String usn = usnTextField.getText();
+		String pw = passwdTextField.getText();
+		try {
+			String user = this.server.validateUser(usn, pw);
+			//open chatroom...
+			if(user == null) throw new IOException("No response received from server: authenticateUser-method");
+			System.out.println("Authenticated as user: " + user);
+		} catch (WrongPassException wpe) {
+			usnTakenLabel.setText("Wrong authentication details.");
+		}
 	}
 
 	public void initialize() {
+		this.server = ClientServer.getCurrentClient();
+		usnTakenLabel.setText("");
+		System.out.println("|Login Screen initialised.");
 	}
-
-	public void setWrongPassword(String s) {
-	}
-
 }
