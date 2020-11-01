@@ -49,10 +49,16 @@ public class ServerSystem {
         }
     }
 
-    public User validateUser(String usn, String psw) throws WrongPassException {
-        synchronized (this){
-            return userSystem.validateUser(usn, psw);
-        }
+    public User validateUser(String usn, String psw, Object newUserMutex) throws WrongPassException {
+            return userSystem.validateUser(usn, psw, newUserMutex);
+    }
+
+    public Iterator<User> getUserListIterator(){
+        return this.userSystem.getUserListIterator();
+    }
+
+    public User getSyncUpdate(){
+        return this.userSystem.getSyncUpdate();
     }
 
     //return an iterator that returns the last "defaultChatSize" messages
@@ -62,6 +68,10 @@ public class ServerSystem {
         } else {
             return messages.listIterator(0);
         }
+    }
+
+    public synchronized Message getFinalMessage(){
+        return messages.get(messages.size()-1);
     }
 
     public synchronized void closeServer(){

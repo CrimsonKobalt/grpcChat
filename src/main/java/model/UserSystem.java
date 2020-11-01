@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.mindrot.jbcrypt.BCrypt;
@@ -27,11 +28,6 @@ public class UserSystem {
             this.readFromFile();
         }
 
-        @Override
-        protected void finalize() {
-            exitUserSystem();
-        }
-
         public void closeUserSystem(){
             exitUserSystem();
         }
@@ -45,24 +41,33 @@ public class UserSystem {
             System.out.println("Critical error with logging detected.");
         }
 
-        private User registerUser(String name, String password) {
+        public Iterator<User> getUserListIterator(){
+            return this.users.listIterator();
+        }
+
+        public User getSyncUpdate(){
+            return this.users.get(users.size()-1);
+        }
+
+        private User registerUser(String name, String password, Object newUserMutex) {
             System.out.println("Registering user: "+name);
             String hash = BCrypt.hashpw(password, BCrypt.gensalt(10));
             User result = new User(name, hash);
             users.add(result);
+            newUserMutex.notify();
             return result;
         }
 
         //Er wordt een wrongpass-exception opgegooid als user al geregistreerd is met een ander passwoord
         //daar kan je de message van gewoon op een van beide fout-locaties printen die voorzien zijn in de loginController.
-        public User validateUser(String name, String password) throws WrongPassException{
+        public User validateUser(String name, String password, Object newUserMutex) throws WrongPassException{
             User user = findUserByName(name);
             if(user != null) {
                 if(!BCrypt.checkpw(password, user.getPassword())) {
-                    throw new WrongPassException();
+                    throw new WrongPassException(name);
                 }
             } else {
-                user = registerUser(name, password);
+                user = registerUser(name, password, newUserMutex);
             }
             return user;
         }

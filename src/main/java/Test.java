@@ -10,17 +10,18 @@ public class Test {
     public static void main(String[] args) throws WrongPassException {
         System.out.println("Commencing test...");
         ServerSystem serverSystem = new ServerSystem("testServer");
+        Object mutex = new Object();
 
-        User user1 = serverSystem.validateUser("new user3", "password");
+        User user1 = serverSystem.validateUser("new user3", "password", mutex);
 
         try {
-            serverSystem.validateUser("new user1", "p4ssw0rd");
+            serverSystem.validateUser("new user1", "p4ssw0rd", mutex);
         } catch (WrongPassException wpe){
             System.out.println("wrong password caught correctly.");
         }
 
         try {
-            User user2 = serverSystem.validateUser("new user1", "password");
+            User user2 = serverSystem.validateUser("new user1", "password", mutex);
             if(user1.equals(user2)){
                 System.out.println("correctly validated a user.");
             }
@@ -59,6 +60,16 @@ public class Test {
             System.out.println("\t" + msgIt.next());
         }
 
+        System.out.println("---------------");
+        System.out.println("commencing testing of sync system...");
+        System.out.println("last registered user: " + serverSystem.getSyncUpdate().getName());
+        System.out.println("last message sent: " + serverSystem.getFinalMessage());
+        System.out.println("adding new message...");
+        serverSystem.addMessage("Message7", user1);
+        System.out.println("last message sent: " + serverSystem.getFinalMessage());
+
+        System.out.println("---------------");
+        System.out.println("commencing shutdown test...");
         serverSystem.closeServer();
     }
 }

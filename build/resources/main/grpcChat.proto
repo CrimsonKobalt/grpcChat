@@ -9,9 +9,17 @@ package tutorial;
 
 //service
 service GroupChat{
+    rpc getGroupHistory(Empty) returns (stream MessageLine) {}
+
     rpc syncGroupChat(Empty) returns (stream MessageLine) {}
 
     rpc sendGroupMessage(MessageLine) returns (Empty) {}
+
+    rpc authenticateUser(UserDetails) returns (Agreement) {}
+
+    rpc getUserList(Empty) returns (stream UserListEntry) {}
+
+    rpc syncUserList(Empty) returns (stream UserListEntry) {}
 }
 
 message Empty {}
@@ -19,4 +27,18 @@ message Empty {}
 message MessageLine{
     string sender = 1;
     string message = 2;
+}
+
+message UserDetails{
+    string name = 1;
+    string password = 2;
+}
+
+message Agreement{
+    bool loginSuccess = 1;
+    string name = 2;
+}
+
+message UserListEntry{
+    string username = 1;
 }
