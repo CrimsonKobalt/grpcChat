@@ -13,7 +13,7 @@ public class Server {
     private final UserSystem userSystem;
     private final List<Message> messages;
 
-    private int defaultChatSize;
+    private final int defaultChatSize;
 
     public Server(String userSystemName, int size){
         this.userSystem = new UserSystem(userSystemName);
@@ -52,7 +52,7 @@ public class Server {
     }
 
     //return an iterator that returns the last "defaultChatSize" messages
-    public Iterator<Message> getMessageIterator(){
+    public synchronized Iterator<Message> getMessageIterator(){
         if(messages.size() > defaultChatSize) {
             return messages.listIterator(messages.size() - defaultChatSize);
         } else {
