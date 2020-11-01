@@ -1,5 +1,6 @@
 package client;
 
+import gui.LoginController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -7,13 +8,18 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class GUIstarter extends Application {
     private static Stage window;
     private static AnchorPane layout;
+    private static GUIstarter gui;
 
     public GUIstarter(){
-        //default empty
+        if(gui == null){
+            gui = this;
+        }
     }
 
     @Override
@@ -22,7 +28,11 @@ public class GUIstarter extends Application {
         window.setResizable(false);
         window.setTitle("grpcChat");
 
-        showLoginForm();
+        try {
+            showLoginForm();
+        } catch (Exception e) {
+            System.out.println(e.getStackTrace());
+        }
     }
 
     @Override
@@ -30,17 +40,17 @@ public class GUIstarter extends Application {
         System.out.println("Shutting down...");
     }
 
-    public void showLoginForm() {
-        showView("gui.LoginForm.fxml");
+    public void showLoginForm() throws MalformedURLException {
+        showView(new URL("file:src/main/java/gui/LoginForm.fxml"));
     }
 
-    public void showGroupChat() {
-        showView("../gui/GroupChat.fxml");
+    public void showGroupChat() throws MalformedURLException{
+        showView(new URL("file:src/main/java/gui/GroupChat.fxml"));
     }
 
-    public void showView(String viewLocation) {
+    public void showView(URL viewLocation) {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(this.getClass().getResource(viewLocation));
+        loader.setLocation(viewLocation);
         try {
             layout = loader.load();
         } catch (IOException e) {
@@ -51,5 +61,9 @@ public class GUIstarter extends Application {
         Scene scene = new Scene(layout);
         window.setScene(scene);
         window.show();
+    }
+
+    public static GUIstarter getCurrentGUI(){
+        return gui;
     }
 }

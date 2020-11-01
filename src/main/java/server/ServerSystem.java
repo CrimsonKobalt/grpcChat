@@ -39,10 +39,11 @@ public class ServerSystem {
         return this.userSystem;
     }
 
-    public void addMessage(String content, User sender){
-        synchronized (this){
+    public void addMessage(String content, User sender, Object newMessageMutex){
+        synchronized (newMessageMutex){
             try {
                 messages.add(new Message(content, sender));
+                newMessageMutex.notifyAll();
             } catch (Exception e){
                 System.out.println("thread-error encountered. Message order might be corrupted.");
             }

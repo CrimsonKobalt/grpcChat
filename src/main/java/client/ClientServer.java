@@ -2,9 +2,7 @@ package client;
 
 
 import exceptions.WrongPassException;
-import grpcchat.Agreement;
-import grpcchat.GroupChatGrpc;
-import grpcchat.UserDetails;
+import grpcchat.*;
 import gui.GroupChatController;
 import gui.LoginController;
 import gui.PrivateChatController;
@@ -12,6 +10,9 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import grpcchat.GroupChatGrpc.GroupChatBlockingStub;
@@ -20,10 +21,11 @@ import grpcchat.GroupChatGrpc.GroupChatStub;
 import io.grpc.StatusRuntimeException;
 
 import javafx.application.Application;
+import model.Message;
 import model.User;
 
 public class ClientServer {
-    private static User user;
+    private User user;
 
     private static GroupChatController groupChatController;
     private static LoginController loginController;
@@ -61,6 +63,7 @@ public class ClientServer {
         try {
             reply = this.blockingStub.authenticateUser(userDetails);
             if (reply.getLoginSuccess()) {
+                this.setUser(new User(reply.getName(), password));
                 return reply.getName();
             } else throw new WrongPassException(username);
         } catch (StatusRuntimeException e) {
@@ -69,12 +72,41 @@ public class ClientServer {
         }
     }
 
-    public static User getUser() {
-        return user;
+    public List<Message> initGroupChatTextArea() {
+        List<Message> result = new ArrayList<>();
+        Iterator<MessageLine> msgListIterator;
+        try {
+            msgListIterator = blockingStub.getGroupHistory(Empty.newBuilder().build());
+        } catch (StatusRuntimeException srte) {
+            srte.printStackTrace();
+            return null;
+        }
+        while(msgListIterator.hasNext()){
+            MessageLine ml = msgListIterator.next();
+            result.add(new Message(ml.getMessage(), ml.getSender()));
+        }
+        return result;
     }
 
-    public static void setUser(User user) {
-        ClientServer.user = user;
+    //returns null if correct, returns a system message if failed.
+    public Message sendGroupMessage(String content){
+        MessageLine ml = MessageLine.newBuilder().setMessage(content).setSender(this.user.getName()).build();
+        Empty response;
+        try {
+            response = blockingStub.sendGroupMessage(ml);
+        } catch (StatusRuntimeException srte){
+            srte.printStackTrace();
+            return new Message("Message not delivered: connection failed.", "System");
+        }
+        return null;
+    }
+
+    public User getUser() {
+        return this.user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public static void setGroupChatController(GroupChatController groupChatController) {

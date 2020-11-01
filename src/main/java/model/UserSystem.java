@@ -19,7 +19,7 @@ public class UserSystem {
         private final String fileName;
 
         public UserSystem(){
-            this("LoginDB.txt");
+            this("LoginDB");
         }
 
         public UserSystem(String fileName) {

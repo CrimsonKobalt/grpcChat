@@ -3,6 +3,7 @@ package gui;
 import java.io.IOException;
 
 import client.ClientServer;
+import client.GUIstarter;
 import exceptions.WrongPassException;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -14,7 +15,8 @@ import javafx.scene.control.TextField;
 import model.User;
 
 public class LoginController {
-	ClientServer server;
+	private ClientServer server;
+	private GUIstarter gui;
 
 	@FXML
 	private Button EnterChatButton;
@@ -37,6 +39,7 @@ public class LoginController {
 			//open chatroom...
 			if(user == null) throw new IOException("No response received from server: authenticateUser-method");
 			System.out.println("Authenticated as user: " + user);
+			gui.showGroupChat();
 		} catch (WrongPassException wpe) {
 			usnTakenLabel.setText("Wrong authentication details.");
 		}
@@ -44,6 +47,7 @@ public class LoginController {
 
 	public void initialize() {
 		this.server = ClientServer.getCurrentClient();
+		this.gui = GUIstarter.getCurrentGUI();
 		usnTakenLabel.setText("");
 		System.out.println("|Login Screen initialised.");
 	}

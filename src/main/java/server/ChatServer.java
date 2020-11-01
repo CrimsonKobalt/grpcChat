@@ -11,6 +11,7 @@ import model.UserSystem;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Scanner;
 
 public class ChatServer{
     private final int port;
@@ -47,10 +48,10 @@ public class ChatServer{
     }
 
     public void stop() {
+        serverSystem.closeServer();
         if (server != null) {
             server.shutdown();
         }
-        serverSystem.closeServer();
     }
 
     private void blockUntilShutdown() throws InterruptedException {
@@ -62,7 +63,10 @@ public class ChatServer{
     public static void main(String[] args) throws Exception{
         ChatServer server = new ChatServer(50050);
         server.start();
-        server.blockUntilShutdown();
+        System.out.println("press the enter key to shutdown server...");
+        Scanner sc = new Scanner(System.in);
+        sc.nextLine();
+        System.exit(0);
     }
 
 
@@ -98,14 +102,12 @@ public class ChatServer{
         }
 
         @Override
-        public synchronized void sendGroupMessage(MessageLine request, StreamObserver<Empty> responseObserver) {
+        public void sendGroupMessage(MessageLine request, StreamObserver<Empty> responseObserver) {
             User sender = serverSystem.getUserSystem().findUserByName(request.getSender());
-            serverSystem.addMessage(request.getMessage(), sender);
-
-            //notify de syncGroupChat-methode voor alle clients dat er een nieuwe message in de stream is!
-            newMessageMutex.notify();
+            serverSystem.addMessage(request.getMessage(), sender, newMessageMutex);
 
             //make sure to send an empty response back to notify the client...
+            responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
         }
 
