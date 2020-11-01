@@ -24,6 +24,8 @@ public class GroupChatController {
 	private User currentUser;
 	private ClientServer server;
 
+	private static GroupChatController currentController;
+
 	@FXML
 	private TextField messageField;
 
@@ -54,16 +56,26 @@ public class GroupChatController {
 
 		//set TextField
 		this.messageField.clear();
+
+		//set a reference to this instance of gui
+		currentController = this;
+
+		//create a thread to monitor textAreaUpdates
+		server.syncMessageList(this);
+
+		/*
+		Thread textAreaUpdater = new Thread(){
+			@Override
+			public void run(){
+				ClientServer.getCurrentClient().syncMessageList(GroupChatController.currentController);
+			}
+		};
+		textAreaUpdater.start();
+		 */
+
 	}
 
 	public void update() {
-		//has to update textArea
-		this.textArea.clear();
-		this.messages.forEach(message -> {
-			this.textArea.appendText(message.format());
-		});
-
-		//has to update userList
 	}
 
 	@FXML
@@ -81,4 +93,8 @@ public class GroupChatController {
 		// System.out.println(userListTable.getSelectionModel().getSelectedItem());
 	}
 
+	public void addMessage(Message message) {
+		this.messages.add(message);
+		this.textArea.appendText(message.format());
+	}
 }

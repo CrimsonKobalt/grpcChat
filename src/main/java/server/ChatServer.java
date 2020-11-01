@@ -88,22 +88,25 @@ public class ChatServer{
         @Override
         public void syncGroupChat(Empty request, StreamObserver<MessageLine> responseObserver) {
             while(true){
-                try {
-                    newMessageMutex.wait();
-                } catch (Exception e){
-                    e.printStackTrace();
-                    responseObserver.onCompleted();
+                synchronized(newMessageMutex){
+                    try {
+                        newMessageMutex.wait();
+                    } catch (Exception e){
+                        e.printStackTrace();
+                        responseObserver.onCompleted();
+                    }
+                    Message msg = serverSystem.getFinalMessage();
+                    responseObserver.onNext(MessageLine.newBuilder().setMessage(msg.getContent())
+                            .setSender(msg.getSenderName())
+                            .build());
                 }
-                Message msg = serverSystem.getFinalMessage();
-                responseObserver.onNext(MessageLine.newBuilder().setMessage(msg.getContent())
-                                                                .setSender(msg.getSenderName())
-                                                                .build());
             }
         }
 
         @Override
         public void sendGroupMessage(MessageLine request, StreamObserver<Empty> responseObserver) {
             User sender = serverSystem.getUserSystem().findUserByName(request.getSender());
+            System.out.println("message received from: " + request.getSender());
             serverSystem.addMessage(request.getMessage(), sender, newMessageMutex);
 
             //make sure to send an empty response back to notify the client...

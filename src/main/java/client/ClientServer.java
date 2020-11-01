@@ -20,6 +20,8 @@ import grpcchat.GroupChatGrpc.GroupChatStub;
 
 import io.grpc.StatusRuntimeException;
 
+import io.grpc.stub.ClientCallStreamObserver;
+import io.grpc.stub.StreamObserver;
 import javafx.application.Application;
 import model.Message;
 import model.User;
@@ -86,6 +88,33 @@ public class ClientServer {
             result.add(new Message(ml.getMessage(), ml.getSender()));
         }
         return result;
+    }
+
+    public void syncMessageList(GroupChatController gui){
+        StreamObserver<MessageLine> observer = new StreamObserver<MessageLine>() {
+            @Override
+            public void onNext(MessageLine value) {
+                System.out.println("Message received: ");
+                System.out.println("\t"+new Message(value.getMessage(), value.getSender()).format());
+                gui.addMessage(new Message(value.getMessage(), value.getSender()));
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                gui.addMessage(new Message("Server Error encountered. Please try again later.", "Server"));
+            }
+
+            @Override
+            public void onCompleted() {
+                return;
+            }
+        };
+        try {
+            System.out.println("|GroupChat|Entering textArea-syncing...");
+            asyncStub.syncGroupChat(Empty.newBuilder().build(), observer);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     //returns null if correct, returns a system message if failed.
