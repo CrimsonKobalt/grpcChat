@@ -1,7 +1,7 @@
 package model;
 
 //aangemaakt om niet te moeten prutsen met die printwriters bij gebruikers
-public class User {
+public class User implements Comparable<User>{
     private String name;
     private String password;
 
@@ -52,5 +52,10 @@ public class User {
     @Override
     public String toString() {
         return this.name + "," + this.password;
+    }
+
+    @Override
+    public int compareTo(User o) {
+        return this.name.compareTo(o.name);
     }
 }

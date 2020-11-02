@@ -33,9 +33,7 @@ public class UserSystem {
         }
 
         public void exitUserSystem() {
-            System.out.println("saving database...");
             if(this.logToFile()) {
-                System.out.println("logged succesfully.");
                 return;
             }
             System.out.println("Critical error with logging detected.");
@@ -86,6 +84,7 @@ public class UserSystem {
         private boolean logToFile() {
             try {
                 BufferedWriter writer = new BufferedWriter(new FileWriter(this.fileName));
+                System.out.println("\tLogging " + users.size() + " users...");
                 writer.write(Integer.toString(users.size()));
                 writer.newLine();
                 for(User user: users) {
@@ -93,6 +92,7 @@ public class UserSystem {
                     writer.newLine();
                 }
                 writer.close();
+                System.out.println("\tUsers logged to database.");
                 return true;
             } catch (IOException ioe) {
                 return false;
@@ -101,13 +101,16 @@ public class UserSystem {
 
         private boolean readFromFile() {
             try {
+                System.out.println("Commencing Server: Loading users...");
                 BufferedReader reader = new BufferedReader(new FileReader(this.fileName));
                 int AmountOfUsers = Integer.parseInt(reader.readLine());
+                System.out.println("\tLoading " + AmountOfUsers + " users...");
                 for(int i=0; i<AmountOfUsers; i++) {
                     String[] userInfo = reader.readLine().split(",");
                     users.add(new User(userInfo[0], userInfo[1]));
                 }
                 reader.close();
+                System.out.println("\tUsers loaded.");
                 return true;
             } catch (IOException ioe) {
                 return false;

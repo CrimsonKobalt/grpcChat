@@ -40,7 +40,7 @@ public class Message {
     }
 
     public String getSenderName(){
-        return this.sender.getName();
+        return this.username;
     }
 
     public String format(){

@@ -79,8 +79,8 @@ public class ClientServer {
         Iterator<MessageLine> msgListIterator;
         try {
             msgListIterator = blockingStub.getGroupHistory(Empty.newBuilder().build());
-        } catch (StatusRuntimeException srte) {
-            srte.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
         while(msgListIterator.hasNext()){
@@ -101,7 +101,7 @@ public class ClientServer {
 
             @Override
             public void onError(Throwable t) {
-                gui.addMessage(new Message("Server Error encountered. Please try again later.", "Server"));
+                gui.addMessage(new Message("Server Error encountered. Messages will unsync. Please try again later.", "Server"));
             }
 
             @Override
@@ -128,6 +128,49 @@ public class ClientServer {
             return new Message("Message not delivered: connection failed.", "System");
         }
         return null;
+    }
+
+    //return null upon error
+    public List<String> getCurrentUserList() {
+        List<String> response = new ArrayList<>();
+        Iterator<UserListEntry> listIterator;
+        try {
+            listIterator = blockingStub.getUserList(Empty.newBuilder().build());
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+        while(listIterator.hasNext()){
+            response.add(listIterator.next().getUsername());
+        }
+        return response;
+    }
+
+    public void syncUserList(GroupChatController gui) {
+        StreamObserver<UserListEntry> usernames = new StreamObserver<UserListEntry>() {
+            @Override
+            public void onNext(UserListEntry value) {
+                System.out.println("New User logged:");
+                System.out.println("\t"+value.getUsername());
+                gui.addUser(value.getUsername());
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                gui.addMessage(new Message("Server error encountered. List with active users desynced. Please try again later", "Server"));
+            }
+
+            @Override
+            public void onCompleted() {
+                return;
+            }
+        };
+        try {
+            System.out.println("|GroupChat|Syncing Userlist...");
+            asyncStub.syncUserList(Empty.newBuilder().build(), usernames);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public User getUser() {

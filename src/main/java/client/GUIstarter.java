@@ -48,6 +48,10 @@ public class GUIstarter extends Application {
         showView(new URL("file:src/main/java/gui/GroupChat.fxml"));
     }
 
+    public void showPrivateChat() throws MalformedURLException{
+        showView(new URL("file:src/main/java/gui/PrivateChat.fxml"));
+    }
+
     public void showView(URL viewLocation) {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(viewLocation);

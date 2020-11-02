@@ -5,6 +5,9 @@ import model.Message;
 import model.User;
 import model.UserSystem;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -32,7 +35,7 @@ public class ServerSystem {
     }
 
     public ServerSystem(){
-        this(5);
+        this(10);
     }
 
     public UserSystem getUserSystem(){
@@ -43,6 +46,17 @@ public class ServerSystem {
         synchronized (newMessageMutex){
             try {
                 messages.add(new Message(content, sender));
+                newMessageMutex.notifyAll();
+            } catch (Exception e){
+                System.out.println("thread-error encountered. Message order might be corrupted.");
+            }
+        }
+    }
+
+    public void addMessage(String content, String senderName, Object newMessageMutex) {
+        synchronized (newMessageMutex){
+            try {
+                messages.add(new Message(content, senderName));
                 newMessageMutex.notifyAll();
             } catch (Exception e){
                 System.out.println("thread-error encountered. Message order might be corrupted.");
@@ -75,7 +89,9 @@ public class ServerSystem {
         return messages.get(messages.size()-1);
     }
 
-    public synchronized void closeServer(){
+    public synchronized void closeServer() {
         userSystem.exitUserSystem();
     }
+
+
 }

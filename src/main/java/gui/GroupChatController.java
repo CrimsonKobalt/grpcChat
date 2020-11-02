@@ -1,9 +1,11 @@
 package gui;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import client.ClientServer;
+import client.GUIstarter;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -23,8 +25,8 @@ public class GroupChatController {
 	private List<Message> messages;
 	private User currentUser;
 	private ClientServer server;
-
-	private static GroupChatController currentController;
+	private GUIstarter gui;
+	private ObservableList<String> userlist;
 
 	@FXML
 	private TextField messageField;
@@ -36,12 +38,15 @@ public class GroupChatController {
 	private TextArea textArea;
 
 	@FXML
-	private ListView<User> userListTable;
+	private ListView<String> userListTable;
 
 	@FXML
 	private Label usnTextField;
 
 	public void initialize() {
+		//set GUIstarter reference
+		this.gui = GUIstarter.getCurrentGUI();
+
 		//set TextArea
 		this.server = ClientServer.getCurrentClient();
 		this.messages = server.initGroupChatTextArea();
@@ -57,22 +62,22 @@ public class GroupChatController {
 		//set TextField
 		this.messageField.clear();
 
-		//set a reference to this instance of gui
-		currentController = this;
+		//set userList
+		List<String> usernames = server.getCurrentUserList();
+		if(usernames == null){
+			textArea.appendText(new Message("Error occurred while fetching user data", "Server").format());
+		} else {
+			Collections.sort(usernames);
+			userlist = FXCollections.observableList(usernames);
+			userListTable.setItems(userlist);
+		}
 
-		//create a thread to monitor textAreaUpdates
+		//add onClick event
+
+
+		//monitor updates
 		server.syncMessageList(this);
-
-		/*
-		Thread textAreaUpdater = new Thread(){
-			@Override
-			public void run(){
-				ClientServer.getCurrentClient().syncMessageList(GroupChatController.currentController);
-			}
-		};
-		textAreaUpdater.start();
-		 */
-
+		server.syncUserList(this);
 	}
 
 	public void update() {
@@ -96,5 +101,13 @@ public class GroupChatController {
 	public void addMessage(Message message) {
 		this.messages.add(message);
 		this.textArea.appendText(message.format());
+	}
+
+	public void addUser(String username) {
+		Platform.runLater(() -> {
+			this.userlist.add(username);
+			Collections.sort(userlist);
+			this.userListTable.setItems(userlist);
+		});
 	}
 }

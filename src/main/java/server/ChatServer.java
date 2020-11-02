@@ -23,7 +23,7 @@ public class ChatServer{
     private static ServerSystem serverSystem;
 
     public ChatServer(int port) throws IOException {
-        this(ServerBuilder.forPort(port), port, 5);
+        this(ServerBuilder.forPort(port), port, 10);
     }
 
     public ChatServer(ServerBuilder<?> serverBuilder, int port, int historySize) {
@@ -119,6 +119,7 @@ public class ChatServer{
             try {
                 System.out.println("auth request: "+ request.getName() +", "+request.getPassword());
                 User user = serverSystem.validateUser(request.getName(), request.getPassword(), newUserMutex);
+                serverSystem.addMessage(user.getName()+" has joined grpcChat!","Server", newMessageMutex);
                 responseObserver.onNext(Agreement.newBuilder().setLoginSuccess(true)
                                                               .setName(request.getName())
                                                               .build());
@@ -141,16 +142,18 @@ public class ChatServer{
             responseObserver.onCompleted();
         }
 
-        public synchronized void syncUserList(Empty request, StreamObserver<UserListEntry> responseObserver) {
+        public void syncUserList(Empty request, StreamObserver<UserListEntry> responseObserver) {
             while(true){
-                try {
-                    newUserMutex.wait();
-                } catch (Exception e){
-                    e.printStackTrace();
-                    responseObserver.onCompleted();
+                synchronized (newUserMutex){
+                    try {
+                        newUserMutex.wait();
+                    } catch (Exception e){
+                        e.printStackTrace();
+                        responseObserver.onCompleted();
+                    }
+                    User user = serverSystem.getSyncUpdate();
+                    responseObserver.onNext(UserListEntry.newBuilder().setUsername(user.getName()).build());
                 }
-                User user = serverSystem.getSyncUpdate();
-                responseObserver.onNext(UserListEntry.newBuilder().setUsername(user.getName()).build());
             }
         }
     }
