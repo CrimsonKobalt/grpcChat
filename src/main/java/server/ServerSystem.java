@@ -2,6 +2,7 @@ package server;
 
 import exceptions.WrongPassException;
 import model.Message;
+import model.PrivateChat;
 import model.User;
 import model.UserSystem;
 
@@ -15,23 +16,28 @@ import java.util.List;
 public class ServerSystem {
     private final UserSystem userSystem;
     private final List<Message> messages;
-
     private final int defaultChatSize;
+
+    private final List<PrivateChat> privateChats;
 
     public ServerSystem(String userSystemName, int size){
         this.userSystem = new UserSystem(userSystemName);
         this.messages = new ArrayList<>();
         this.defaultChatSize = size;
+
+        this.privateChats = new ArrayList<>();
     }
 
     public ServerSystem(String userSystemName){
-        this(userSystemName, 5);
+        this(userSystemName, 10);
     }
 
     public ServerSystem(int size){
         this.userSystem = new UserSystem();
         this.messages = new ArrayList<>();
         this.defaultChatSize = size;
+
+        this.privateChats = new ArrayList<>();
     }
 
     public ServerSystem(){
@@ -64,6 +70,13 @@ public class ServerSystem {
         }
     }
 
+    public void addNotification(String receiver, String content, Object newUserMutex){
+        synchronized (newUserMutex){
+            User user = this.userSystem.findUserByName(receiver);
+            user.makeNotification(new Message(content, "SERVER"));
+        }
+    }
+
     public User validateUser(String usn, String psw, Object newUserMutex) throws WrongPassException {
             return userSystem.validateUser(usn, psw, newUserMutex);
     }
@@ -93,5 +106,16 @@ public class ServerSystem {
         userSystem.exitUserSystem();
     }
 
-
+    public PrivateChat findPrivateChat(User user1, User user2){
+        synchronized (privateChats) {
+            for (PrivateChat pc : privateChats) {
+                if (pc.belongsTo(user1, user2)) {
+                    return pc;
+                }
+            }
+            PrivateChat result = new PrivateChat(user1, user2);
+            privateChats.add(result);
+            return result;
+        }
+    }
 }

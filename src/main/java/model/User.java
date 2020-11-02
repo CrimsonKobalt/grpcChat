@@ -1,14 +1,21 @@
 package model;
 
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Queue;
+
 //aangemaakt om niet te moeten prutsen met die printwriters bij gebruikers
 public class User implements Comparable<User>{
     private String name;
     private String password;
 
+    private final Queue<Message> notifications;
+
     public User(String name, String password) {
         super();
         this.name = name;
         this.password = password;
+        this.notifications = new LinkedList<>();
     }
 
     public String getName() {
@@ -57,5 +64,21 @@ public class User implements Comparable<User>{
     @Override
     public int compareTo(User o) {
         return this.name.compareTo(o.name);
+    }
+
+    public Queue<Message> getNotificationsMutex(){
+        return this.notifications;
+    }
+
+    public void makeNotification(Message message){
+        this.notifications.offer(message);
+    }
+
+    public boolean hasMoreNotifications(){
+        return (this.notifications.peek() != null);
+    }
+
+    public Message getNotification(){
+        return this.notifications.poll();
     }
 }

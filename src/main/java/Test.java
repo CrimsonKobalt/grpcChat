@@ -4,6 +4,8 @@ import model.User;
 import server.ServerSystem;
 
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Test {
     //testfile aanpassing
@@ -72,5 +74,13 @@ public class Test {
         System.out.println("---------------");
         System.out.println("commencing shutdown test...");
         serverSystem.closeServer();
+
+        //testing Queue
+        Queue<Message> queue = new LinkedList<>();
+        queue.offer(new Message("test", "user1"));
+        System.out.println(queue.peek().format());
+        System.out.println(queue.poll().format());
+        queue.offer(new Message("testmore", "user2"));
+        System.out.println(queue.poll().format());
     }
 }

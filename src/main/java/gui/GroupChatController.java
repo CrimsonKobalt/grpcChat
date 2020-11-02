@@ -1,11 +1,18 @@
 package gui;
 
+import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import client.ClientServer;
 import client.GUIstarter;
+import grpcchat.MessageLine;
+import grpcchat.Notification;
+import grpcchat.UserDetails;
+import grpcchat.UserListEntry;
+import io.grpc.Context;
+import io.grpc.stub.StreamObserver;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -28,6 +35,10 @@ public class GroupChatController {
 	private GUIstarter gui;
 	private ObservableList<String> userlist;
 
+	private static StreamObserver<Notification> notificationObserver;
+	private static StreamObserver<MessageLine> messageObserver;
+	private static StreamObserver<UserListEntry> userObserver;
+
 	@FXML
 	private TextField messageField;
 
@@ -43,16 +54,27 @@ public class GroupChatController {
 	@FXML
 	private Label usnTextField;
 
+	public GroupChatController(){
+		notificationObserver = null;
+		messageObserver = null;
+		userObserver = null;
+	}
+
 	public void initialize() {
 		//set GUIstarter reference
 		this.gui = GUIstarter.getCurrentGUI();
+		this.server = ClientServer.getCurrentClient();
 
 		//set TextArea
-		this.server = ClientServer.getCurrentClient();
 		this.messages = server.initGroupChatTextArea();
 		this.textArea.clear();
+		//fetching groupchat...
 		this.messages.forEach(message -> {
 			this.textArea.appendText(message.format());
+		});
+		//fetching notifications...
+		server.getNotifications().forEach(string -> {
+			this.textArea.appendText(string);
 		});
 
 		//set User data
@@ -72,12 +94,36 @@ public class GroupChatController {
 			userListTable.setItems(userlist);
 		}
 
-		//add onClick event
+		//add onClick event to listview
+		User currentUser = this.currentUser;
+		userListTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				System.out.println("ListView selection changed from oldValue = "
+						+ oldValue + " to newValue = " + newValue);
+				try {
+					if(!currentUser.getName().equals(newValue)){
+						gui.showPrivateChat(newValue);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 
+		//console logging
+		System.out.println("|GroupChat initialised.");
 
 		//monitor updates
-		server.syncMessageList(this);
-		server.syncUserList(this);
+		if(userObserver == null){
+			userObserver = server.syncUserList(this);
+		}
+		if(notificationObserver == null){
+			notificationObserver = server.syncNotifications(this);
+		}
+		if(messageObserver == null) {
+			messageObserver = server.syncMessageList(this);
+		}
 	}
 
 	public void update() {
@@ -93,6 +139,7 @@ public class GroupChatController {
 		}
 	}
 
+	//this goes unused as is.
 	@FXML
 	public void clickUserName(ActionEvent ae) {
 		// System.out.println(userListTable.getSelectionModel().getSelectedItem());
@@ -101,6 +148,10 @@ public class GroupChatController {
 	public void addMessage(Message message) {
 		this.messages.add(message);
 		this.textArea.appendText(message.format());
+	}
+
+	public void addNotification(String notification){
+		this.textArea.appendText(notification);
 	}
 
 	public void addUser(String username) {

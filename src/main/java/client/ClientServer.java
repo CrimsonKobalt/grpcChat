@@ -6,8 +6,7 @@ import grpcchat.*;
 import gui.GroupChatController;
 import gui.LoginController;
 import gui.PrivateChatController;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
+import io.grpc.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,8 +16,6 @@ import java.util.concurrent.TimeUnit;
 
 import grpcchat.GroupChatGrpc.GroupChatBlockingStub;
 import grpcchat.GroupChatGrpc.GroupChatStub;
-
-import io.grpc.StatusRuntimeException;
 
 import io.grpc.stub.ClientCallStreamObserver;
 import io.grpc.stub.StreamObserver;
@@ -90,7 +87,7 @@ public class ClientServer {
         return result;
     }
 
-    public void syncMessageList(GroupChatController gui){
+    public StreamObserver<MessageLine> syncMessageList(GroupChatController gui){
         StreamObserver<MessageLine> observer = new StreamObserver<MessageLine>() {
             @Override
             public void onNext(MessageLine value) {
@@ -101,7 +98,7 @@ public class ClientServer {
 
             @Override
             public void onError(Throwable t) {
-                gui.addMessage(new Message("Server Error encountered. Messages will unsync. Please try again later.", "Server"));
+                gui.addMessage(new Message("Server Error encountered. Messages will unsync. Please try again later.", "SERVER"));
             }
 
             @Override
@@ -112,8 +109,10 @@ public class ClientServer {
         try {
             System.out.println("|GroupChat|Entering textArea-syncing...");
             asyncStub.syncGroupChat(Empty.newBuilder().build(), observer);
+            return observer;
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
     }
 
@@ -125,7 +124,7 @@ public class ClientServer {
             response = blockingStub.sendGroupMessage(ml);
         } catch (StatusRuntimeException srte){
             srte.printStackTrace();
-            return new Message("Message not delivered: connection failed.", "System");
+            return new Message("Message not delivered: connection failed.", "SYSTEM");
         }
         return null;
     }
@@ -146,7 +145,7 @@ public class ClientServer {
         return response;
     }
 
-    public void syncUserList(GroupChatController gui) {
+    public StreamObserver<UserListEntry> syncUserList(GroupChatController gui) {
         StreamObserver<UserListEntry> usernames = new StreamObserver<UserListEntry>() {
             @Override
             public void onNext(UserListEntry value) {
@@ -157,7 +156,7 @@ public class ClientServer {
 
             @Override
             public void onError(Throwable t) {
-                gui.addMessage(new Message("Server error encountered. List with active users desynced. Please try again later", "Server"));
+                gui.addMessage(new Message("Server error encountered. List with active users desynced. Please try again later", "SERVER"));
             }
 
             @Override
@@ -168,8 +167,120 @@ public class ClientServer {
         try {
             System.out.println("|GroupChat|Syncing Userlist...");
             asyncStub.syncUserList(Empty.newBuilder().build(), usernames);
+            return usernames;
         } catch (Exception e){
             e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<String> getPrivateChatMessages(String otherUserName){
+        List<String> result = new ArrayList<>();
+        Iterator<PrivateMessageDetails> prvIterator;
+        try {
+            prvIterator = blockingStub.getPrivateChat(PrivateMessageDetails.newBuilder().setSender(this.user.getName())
+                                                                                        .setReceiver(otherUserName)
+                                                                                        .setContent("").build());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        while(prvIterator.hasNext()) {
+            PrivateMessageDetails details = prvIterator.next();
+            result.add(new Message(details.getContent(), details.getSender()).format());
+        }
+        return result;
+    }
+
+    public void syncPrivateMessages(PrivateChatController gui, String otherUser){
+        StreamObserver<PrivateMessageDetails> observer = new StreamObserver<PrivateMessageDetails>() {
+            @Override
+            public void onNext(PrivateMessageDetails value) {
+                System.out.println("New Private Message received:");
+                System.out.println("\tSender: " + value.getSender());
+                System.out.println("\tContent: " + value.getContent());
+                gui.addMessage(new Message(value.getContent(), value.getSender()).format());
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                gui.addMessage(new Message("Error encountered while syncing messages.", "SERVER").format());
+            }
+
+            @Override
+            public void onCompleted() {
+                return;
+            }
+        };
+        PrivateMessageDetails request = PrivateMessageDetails.newBuilder().setSender(this.user.getName())
+                                                                          .setReceiver(otherUser)
+                                                                          .setContent("").build();
+        try {
+            System.out.println("|PrivateChat|Syncing messages...");
+            asyncStub.syncPrivateChat(request, observer);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    //returns an error message if failed, returns null if success.
+    public Message sendPrivateMessage(String receiverName, String content){
+        PrivateMessageDetails toSend = PrivateMessageDetails.newBuilder().setContent(content)
+                                                                         .setReceiver(receiverName)
+                                                                         .setSender(this.user.getName()).build();
+        Empty response;
+        try {
+            response  = blockingStub.sendPrivateMessage(toSend);
+        } catch (Exception e){
+            e.printStackTrace();
+            return new Message("ERROR: Message could not be deliverd to server", "SYSTEM");
+        }
+        return null;
+    }
+
+    public List<String> getNotifications(){
+        List<String> result = new ArrayList<>();
+        Iterator<Notification> notifIt;
+        try {
+            notifIt = blockingStub.fetchNotifications(UserListEntry.newBuilder().setUsername(this.user.getName()).build());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        while(notifIt.hasNext()){
+            Notification details = notifIt.next();
+            result.add(details.getContent());
+        }
+        return result;
+    }
+
+    public StreamObserver<Notification> syncNotifications(GroupChatController gui){
+        StreamObserver<Notification> response = new StreamObserver<Notification>() {
+            @Override
+            public void onNext(Notification value) {
+                System.out.println("New notification received:");
+                System.out.println("\t" + value.getContent());
+                gui.addNotification(value.getContent());
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                gui.addMessage(new Message("Error encountered while syncing notifications.", "SERVER"));
+            }
+
+            @Override
+            public void onCompleted() {
+
+            }
+        };
+        UserListEntry request = UserListEntry.newBuilder().setUsername(this.user.getName()).build();
+        try {
+            System.out.println("|GroupChat|Syncing notifications...");
+            asyncStub.syncNotifications(request, response);
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -196,4 +307,5 @@ public class ClientServer {
     public static ClientServer getCurrentClient() {
         return currentClient;
     }
+
 }

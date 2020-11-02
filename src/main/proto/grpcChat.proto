@@ -20,6 +20,17 @@ service GroupChat{
     rpc getUserList(Empty) returns (stream UserListEntry) {}
 
     rpc syncUserList(Empty) returns (stream UserListEntry) {}
+
+//below is all for private chat: need a notification system: else it's impossible to know if private messages were sent...
+    rpc fetchNotifications(UserListEntry) returns (stream Notification) {}
+
+    rpc syncNotifications(UserListEntry) returns (stream Notification) {}
+
+    rpc sendPrivateMessage(PrivateMessageDetails) returns (Empty) {}
+
+    rpc getPrivateChat(PrivateMessageDetails) returns (stream PrivateMessageDetails) {}
+
+    rpc syncPrivateChat(PrivateMessageDetails) returns (stream PrivateMessageDetails) {}
 }
 
 message Empty {}
@@ -41,4 +52,14 @@ message Agreement{
 
 message UserListEntry{
     string username = 1;
+}
+
+message PrivateMessageDetails{
+    string sender = 1;
+    string receiver = 2;
+    string content = 3;
+}
+
+message Notification{
+    string content = 1;
 }
