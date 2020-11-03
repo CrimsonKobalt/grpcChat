@@ -19,7 +19,7 @@
          <children>
             <VBox prefHeight="519.0" prefWidth="584.0">
                <children>
-                  <Label alignment="CENTER" prefHeight="58.0" prefWidth="679.0" style="-fx-background-color: #181818;" text="RMIChat" textAlignment="CENTER" textFill="ANTIQUEWHITE" underline="true">
+                  <Label alignment="CENTER" prefHeight="58.0" prefWidth="679.0" style="-fx-background-color: #181818;" text="grpcChat" textAlignment="CENTER" textFill="ANTIQUEWHITE" underline="true">
                      <font>
                         <Font size="25.0" />
                      </font>

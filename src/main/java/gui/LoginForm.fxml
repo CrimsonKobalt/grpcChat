@@ -16,7 +16,7 @@
    <children>
       <FlowPane alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Label alignment="TOP_CENTER" text="Welcome to RMIChat" textAlignment="CENTER" textFill="ANTIQUEWHITE" underline="true">
+            <Label alignment="TOP_CENTER" text="Welcome to grpcChat" textAlignment="CENTER" textFill="ANTIQUEWHITE" underline="true">
                <font>
                   <Font size="21.0" />
                </font>
@@ -44,7 +44,7 @@
                   <Insets bottom="10.0" left="40.0" right="100.0" />
                </FlowPane.margin>
             </Label>
-            <Button fx:id="EnterChatButton" mnemonicParsing="false" onAction="#enterChatButtonClicked" style="-fx-background-color: black; -fx-border-radius: 1px; -fx-border-color: #faebd7;" text="Enter RMIChat" textFill="ANTIQUEWHITE">
+            <Button fx:id="EnterChatButton" mnemonicParsing="false" onAction="#enterChatButtonClicked" style="-fx-background-color: black; -fx-border-radius: 1px; -fx-border-color: #faebd7;" text="Enter grpcChat" textFill="ANTIQUEWHITE">
                <FlowPane.margin>
                   <Insets left="40.0" right="100.0" />
                </FlowPane.margin>
