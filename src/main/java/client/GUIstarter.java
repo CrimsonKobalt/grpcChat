@@ -18,8 +18,8 @@ public class GUIstarter extends Application {
     private static AnchorPane layout;
     private static GUIstarter gui;
 
-    private LoginController loginController = new LoginController();
-    private GroupChatController groupChatController = new GroupChatController();
+    private final LoginController loginController = new LoginController();
+    private final GroupChatController groupChatController = new GroupChatController();
 
     public GUIstarter(){
         if(gui == null){
@@ -36,7 +36,8 @@ public class GUIstarter extends Application {
         try {
             showLoginForm();
         } catch (Exception e) {
-            System.out.println(e.getStackTrace());
+            System.err.println(e.getStackTrace());
+            System.err.println(e.getMessage());
         }
     }
 
@@ -46,15 +47,15 @@ public class GUIstarter extends Application {
     }
 
     public void showLoginForm() throws MalformedURLException {
-        showView(new URL("file:src/main/java/gui/LoginForm.fxml"), loginController);
+        showView(getClass().getResource("/gui/LoginForm.fxml"), loginController);
     }
 
     public void showGroupChat() throws MalformedURLException{
-        showView(new URL("file:src/main/java/gui/GroupChat.fxml"), groupChatController);
+        showView(getClass().getResource("/gui/GroupChat.fxml"), groupChatController);
     }
 
     public void showPrivateChat(String otherUser) throws MalformedURLException{
-        showView(new URL("file:src/main/java/gui/PrivateChat.fxml"), otherUser);
+        showView(getClass().getResource("/gui/PrivateChat.fxml"), otherUser);
     }
 
     public void showView(URL viewLocation, Object controller) {

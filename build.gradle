@@ -59,7 +59,16 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile 'io.grpc:grpc-all:1.12.0'
     compile 'javax.annotation:javax.annotation-api:1.2'
-    implementation files('libs/jbcrypt-0.4.jar')
+    compile files('libs/jbcrypt-0.4.jar')
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs = ["src/main/java"]
+            includes = ["**/*.fxml"]
+        }
+    }
 }
 
 idea {
@@ -85,4 +94,31 @@ task runServer(type: JavaExec) {
 task runClient(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'client.ClientServer'
+}
+
+task buildServerJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': 'server.ChatServer'
+    }
+    baseName='grpcServer'
+    from { configurations.compile.collect {it.isDirectory() ? it : zipTree(it)}}
+    with jar
+}
+
+task buildClientJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': 'client.ClientServer'
+    }
+    baseName='grpcClient'
+    from { configurations.compile.collect {it.isDirectory() ? it : zipTree(it)}}
+    with jar
+}
+
+task buildZip(type: Zip) {
+    from compileJava
+    from processResources
+    into('lib') {
+        from configurations.runtime
+    }
+    archiveFileName = "grpcChat.zip"
 }
