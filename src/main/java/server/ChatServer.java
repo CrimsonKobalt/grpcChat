@@ -38,7 +38,7 @@ public class ChatServer{
 
     public void start() throws IOException{
         server.start();
-        /*Runtime.getRuntime().addShutdownHook(new Thread() {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
                 // Use stderr here since the logger may has been reset by its JVM shutdown hook.
@@ -46,7 +46,7 @@ public class ChatServer{
                 ChatServer.this.stop();
                 System.err.println("*** server shut down");
             }
-        });*/
+        });
     }
 
     public void stop() {

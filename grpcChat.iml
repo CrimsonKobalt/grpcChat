@@ -47,6 +47,83 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
+          <root url="jar://C:/Users/Beheerder/.gradle/caches/modules-2/files-2.1/org.openjfx/javafx-fxml/12/4ba85a93963ad9c5264b5773028512b8217255e6/javafx-fxml-12-win.jar!/"/>
+        </CLASSES>
+        <JAVADOC/>
+        <SOURCES>
+          <root url="jar://C:/Users/Beheerder/.gradle/caches/modules-2/files-2.1/org.openjfx/javafx-fxml/12/ea014fb305af116f7a274d6a1ba6c4430a75d750/javafx-fxml-12-sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/Users/Beheerder/.gradle/caches/modules-2/files-2.1/org.openjfx/javafx-controls/12/45d9af154b384e2eb9d787f5d8621b4f54df0d28/javafx-controls-12-win.jar!/"/>
+        </CLASSES>
+        <JAVADOC/>
+        <SOURCES>
+          <root url="jar://C:/Users/Beheerder/.gradle/caches/modules-2/files-2.1/org.openjfx/javafx-controls/12/b94e4ee04a2ef5ae1bf30ce4514fc4f773b3af57/javafx-controls-12-sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/Users/Beheerder/.gradle/caches/modules-2/files-2.1/org.openjfx/javafx-controls/12/94cdaad6a3f02e64207429bcdac788dce8069bc6/javafx-controls-12.jar!/"/>
+        </CLASSES>
+        <JAVADOC/>
+        <SOURCES>
+          <root url="jar://C:/Users/Beheerder/.gradle/caches/modules-2/files-2.1/org.openjfx/javafx-controls/12/b94e4ee04a2ef5ae1bf30ce4514fc4f773b3af57/javafx-controls-12-sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/Users/Beheerder/.gradle/caches/modules-2/files-2.1/org.openjfx/javafx-graphics/12/ec4fc19a5d3469da4a7539ce0cc7d2b48bf484d0/javafx-graphics-12-win.jar!/"/>
+        </CLASSES>
+        <JAVADOC/>
+        <SOURCES>
+          <root url="jar://C:/Users/Beheerder/.gradle/caches/modules-2/files-2.1/org.openjfx/javafx-graphics/12/9c652c5cdb759b4fe182c60219cfeb3ea19a0ebc/javafx-graphics-12-sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/Users/Beheerder/.gradle/caches/modules-2/files-2.1/org.openjfx/javafx-graphics/12/8796b8816a3272d8ee4660e7f4627d61243c4084/javafx-graphics-12.jar!/"/>
+        </CLASSES>
+        <JAVADOC/>
+        <SOURCES>
+          <root url="jar://C:/Users/Beheerder/.gradle/caches/modules-2/files-2.1/org.openjfx/javafx-graphics/12/9c652c5cdb759b4fe182c60219cfeb3ea19a0ebc/javafx-graphics-12-sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/Users/Beheerder/.gradle/caches/modules-2/files-2.1/org.openjfx/javafx-base/12/70354cbca618a7a61d46a10539d079dca345f535/javafx-base-12-win.jar!/"/>
+        </CLASSES>
+        <JAVADOC/>
+        <SOURCES>
+          <root url="jar://C:/Users/Beheerder/.gradle/caches/modules-2/files-2.1/org.openjfx/javafx-base/12/fd26e91311c3eac67fb63fd5ee728fb0a66e3cc7/javafx-base-12-sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/Users/Beheerder/.gradle/caches/modules-2/files-2.1/org.openjfx/javafx-base/12/3179ee52ad6d4cf3ccd306e48f3d8cbf9078b038/javafx-base-12.jar!/"/>
+        </CLASSES>
+        <JAVADOC/>
+        <SOURCES>
+          <root url="jar://C:/Users/Beheerder/.gradle/caches/modules-2/files-2.1/org.openjfx/javafx-base/12/fd26e91311c3eac67fb63fd5ee728fb0a66e3cc7/javafx-base-12-sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
           <root url="jar://C:/Users/Beheerder/.gradle/caches/modules-2/files-2.1/io.grpc/grpc-auth/1.12.0/800b55073d3ee3d97550c85026ab9281f4509114/grpc-auth-1.12.0.jar!/"/>
         </CLASSES>
         <JAVADOC/>
